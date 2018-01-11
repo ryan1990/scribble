@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Scribble</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="myCanvas">
+      <p>Canvas not available in this Web Browser! Try on a different browser.</p>
+    </canvas>
+
+    <script>
+      var canvas = document.querySelector('.myCanvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      var context2d = canvas.getContext('2d');
+
+      context2d.fillStyle = 'rgb(0,0,0)';
+      context2d.fillRect(0,0,canvas.width,canvas.height);
+      context2d.translate(canvas.width/2,canvas.height/2);
+      window.onload = draw;
+      
+      function draw() {
+        square.render(context2d);
+        square.update();
+        window.requestAnimationFrame(draw);
+      };
+
+      function GetPixelXFromPercent(x) {
+        return (x/100) * (canvas.width/2);
+      }
+
+      function GetPixelYFromPercent(y) {
+        return (y/100) * (canvas.height/2);
+      }
+
+      var square = {
+      // position values are given in terms of percent width and height of canvas, which can be positive or negative.        
+        x:0,
+        y:0,
+        xVel:.3,
+        yVel:.3,
+        xAcc:-.02,
+        yAcc:-.02,
+        width:3,
+        height:3,
+        color: {
+          red:255,
+          green:255,
+          blue:255,
+          redVel:-.5,
+          greenVel:-.14,
+          blueVel:-.30
+        },
+        update: function() {
+          if (this.x > 100) {
+            this.x = -100;
+          } else if (this.x < -100) {
+            this.x = 100;
+          } else {
+            this.x += this.xVel;
+            this.xVel += this.xAcc;
+          }
+
+          if (this.xVel < -.4 || this.xVel > .4) {
+            this.xVel *= 3/4;
+            this.xAcc = -this.xAcc;
+          }
+          
+          if (this.yVel < -.6 || this.yVel > .6) {
+            this.yVel *= 3/4;
+            this.yAcc = -this.yAcc;
+          }
+
+          if (this.y > 100) {
+            this.y = -100;
+          } else if (this.y < -100) {
+            this.y = 100;
+          } else {
+            this.y += this.yVel;
+            this.yVel += this.yAcc;
+          }
+
+          this.attemptMutation();
+
+          // color
+          if (this.color.red < 0 || this.color.red > 255) {
+            this.color.redVel = -this.color.redVel;
+          }
+
+          if (this.color.green < 0 || this.color.green > 255) {
+            this.color.greenVel = -this.color.greenVel;
+          }
+
+          if (this.color.blue < 0 || this.color.blue > 255) {
+            this.color.blueVel = -this.color.blueVel;
+          }
+
+          this.color.red += this.color.redVel;
+          this.color.green += this.color.greenVel;
+          this.color.blue += this.color.blueVel;
+        },
+        // handles random reversal of acceleration variables
+        attemptMutation: function() {
+          var random = Math.floor(Math.random() * (this.color.red/6) * (this.color.green/255));
+          if (random == 0) {
+            this.xAcc = -this.xAcc;
+          } else if (random == 1) {
+            this.yAcc = -this.yAcc;
+          }
+        },
+        // draws to screen
+        render: function(context) {
+          var pixelX = GetPixelXFromPercent(this.x);
+          var pixelY = GetPixelYFromPercent(this.y);
+          var pixelWidth = GetPixelXFromPercent(this.width);
+          var pixelHeight = GetPixelYFromPercent(this.height);
+          
+          context.fillStyle = 'rgb('+this.color.red+','+this.color.green+','+this.color.blue+')';
+          context.fillRect(pixelX, pixelY, pixelWidth, pixelHeight);
+        }
+      }
+    </script>
+  </body>
+</html>
