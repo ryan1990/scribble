@@ -122,7 +122,12 @@
           var pixelWidth = GetPixelXFromPercent(this.width);
           var pixelHeight = GetPixelYFromPercent(this.height);
           
-          context.fillStyle = 'rgb('+this.color.red+','+this.color.green+','+this.color.blue+')';
+          // we use Math.floor because some browsers don't work with decimal numbers in the fillStyle string
+          var red = Math.floor(this.color.red);
+          var green = Math.floor(this.color.green);
+          var blue = Math.floor(this.color.blue);
+          
+          context.fillStyle = 'rgb('+red+','+green+','+blue+')';
           context.fillRect(pixelX, pixelY, pixelWidth, pixelHeight);
         }
       }
